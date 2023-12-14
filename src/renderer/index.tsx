@@ -6,8 +6,13 @@ const root = createRoot(container);
 root.render(<App />);
 
 // calling IPC exposed from preload script
-window.electron.ipcRenderer.once('ipc-example', (arg) => {
-  // eslint-disable-next-line no-console
-  console.log(arg);
+//  pager.js (render)
+console.log("Sending message to main process");
+window.electron.ipcRenderer.sendMessage('open-file', {
+  title: 'Title',
+  defaultPath: localStorage.getItem('defaultPath')
 });
-window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
+
+window.electron.ipcRenderer.on('open-file-paths', (event: any) => {
+  console.log(event);
+});

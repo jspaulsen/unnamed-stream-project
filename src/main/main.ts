@@ -14,6 +14,9 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import Configuration from './configuration';
+import { MessageQueue, WebsocketServer, Message, MessageType, Action } from './websocket';
+import * as ipc from './ipc';
 
 class AppUpdater {
   constructor() {
@@ -25,10 +28,41 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+const configuration: Configuration = Configuration.getInstance();
+const queue = new MessageQueue();
+const websocket = new WebsocketServer({
+  port: configuration.websocketPort,
+  queue: queue,
+});
+
+// TODO: if I ever never to change this, i'll have to re-host it; we may want to export this later
+websocket.run();
+
+// sendMessage();
+
+// function sendMessage() {
+//   // every 2 seconds, send a message
+//   setInterval(async () => {
+//     const message: Message = {
+//       message_type: MessageType.Mixed,
+//       steps: [
+//         {
+//           source_type: MessageType.Image,
+//           source_url: 'https://www.w3schools.com/html/pic_trulli.jpg',
+//           position_x: 150,
+//           position_y: 150,
+//           duration: 2,
+//         },
+//       ],
+//     };
+
+//     await queue.enqueue(message);
+//   }, 5000);
+// }
+
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+  event.reply('ipc-example', msgTemplate(configuration.websocketPort.toString()));
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -135,3 +169,9 @@ app
     });
   })
   .catch(console.log);
+
+
+export {
+  mainWindow,
+  ipc,
+}
