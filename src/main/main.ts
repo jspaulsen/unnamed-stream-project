@@ -18,6 +18,7 @@ import Configuration from './configuration';
 import { MessageQueue, WebsocketServer, Message, MessageType, Action } from './websocket';
 import * as ipc from './ipc';
 
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -29,9 +30,11 @@ class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 
 const configuration: Configuration = Configuration.getInstance();
+// log the app directory
+console.log('app directory', app.getPath('userData') + '/unnamed-application' + '/data');
 const queue = new MessageQueue();
 const websocket = new WebsocketServer({
-  port: configuration.websocketPort,
+  port: configuration.get('websocketPort'),
   queue: queue,
 });
 
@@ -60,10 +63,6 @@ websocket.run();
 //   }, 5000);
 // }
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  event.reply('ipc-example', msgTemplate(configuration.websocketPort.toString()));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -174,4 +173,5 @@ app
 export {
   mainWindow,
   ipc,
+  websocket,
 }

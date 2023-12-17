@@ -1,5 +1,10 @@
-import { IpcMainEvent, dialog, ipcMain } from 'electron';
+import { BrowserWindow, IpcMain, IpcMainEvent, IpcMainInvokeEvent, dialog, ipcMain } from 'electron';
 import { mainWindow } from './main';
+import Configuration from './configuration';
+import axios from 'axios';
+import { access } from 'fs';
+import { authorizeTwitch } from './auth';
+import { config } from 'process';
 
 
 interface Filters {
@@ -9,30 +14,49 @@ interface Filters {
 
 interface OpenFileData {
     title: string;
-    defaultPath: string;
+    defaultPath?: string;
     filters: Filters[];
 }
 
-ipcMain.on('open-file', async (event: IpcMainEvent, data: OpenFileData) => {
-    console.log(event);
-    console.log(data); // title, defaultPath
-
+ipcMain.handle('open-file', async (event: IpcMainInvokeEvent, data: OpenFileData) => {
     if (!mainWindow) {
         return;
     }
 
-    dialog.showOpenDialog(mainWindow, {})
-        .then(result => {
-            event.reply('open-file-paths', result);
-        }).catch(err => {
-            console.error(err);
-        });
+    if (!data.defaultPath) {
+        data.defaultPath = '.';
+    }
+
+    return await dialog.showOpenDialog(mainWindow, data);
 });
 
-console.log('ipc.ts loaded');
+ipcMain.handle('get-access-token', async (_: IpcMainInvokeEvent, __: any) => {
+    return Configuration
+        .getInstance()
+        .getSecret('accessToken');
+});
+
+ipcMain.handle('set-access-token', async (event: IpcMainInvokeEvent, data: any) => {
+    console.log('set-access-token', data);
+    Configuration
+        .getInstance()
+        .setSecret('accessToken', data.accessToken);
+});
+
+ipcMain.handle('authorize-twitch', async (event: IpcMainInvokeEvent, data: any) => {
+    const configuration = Configuration.getInstance();
+    const clientId = configuration.get('twitchClientId');
+    const scopes = configuration.get('twitchScopes');
+
+    const result = authorizeTwitch({
+        clientId,
+        scopes,
+    });
+
+    return result;
+});
+
 
 export {
     ipcMain,
 }
-
-// https://stackoverflow.com/questions/70331707/how-do-i-use-showopendialog-withe-electron-s-ipc
