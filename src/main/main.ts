@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -17,6 +17,7 @@ import { resolveHtmlPath } from './util';
 import Configuration from './configuration';
 import { MessageQueue, WebsocketServer, Message, MessageType, Action } from './websocket';
 import * as ipc from './ipc';
+import { httpServer } from './http';
 
 
 class AppUpdater {
@@ -30,39 +31,54 @@ class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 
 const configuration: Configuration = Configuration.getInstance();
+
 // log the app directory
 console.log('app directory', app.getPath('userData') + '/unnamed-application' + '/data');
+
 const queue = new MessageQueue();
 const websocket = new WebsocketServer({
   port: configuration.get('websocketPort'),
   queue: queue,
 });
 
-// TODO: if I ever never to change this, i'll have to re-host it; we may want to export this later
+
 websocket.run();
+httpServer.listen(
+  configuration.get('httpPort'),
+  () => { console.log(`listening on port ${configuration.get('httpPort')}`) },
+);
 
-// sendMessage();
+function sendMessage() {
+  setInterval(async () => {
+    const message: Message = {
+      message_type: MessageType.Mixed,
+      steps: [
+        {
+          source_type: MessageType.Image,
+          source_url: 'https://www.w3schools.com/html/pic_trulli.jpg',
+          position_x: 150,
+          position_y: 150,
+          duration: 2,
+        } as Action,
+        {
+          source_type: MessageType.Text,
+          text: 'Hello World',
+          position_x: 150,
+          position_y: 150,
+          font_size: 72,
+          font_family: 'Comic Sans MS',
+          font_color: 'red',
+          duration: 2,
+        } as Action,
+      ],
+    };
 
-// function sendMessage() {
-//   // every 2 seconds, send a message
-//   setInterval(async () => {
-//     const message: Message = {
-//       message_type: MessageType.Mixed,
-//       steps: [
-//         {
-//           source_type: MessageType.Image,
-//           source_url: 'https://www.w3schools.com/html/pic_trulli.jpg',
-//           position_x: 150,
-//           position_y: 150,
-//           duration: 2,
-//         },
-//       ],
-//     };
+    await queue.enqueue(message);
+  }, 5000);
+}
 
-//     await queue.enqueue(message);
-//   }, 5000);
-// }
 
+sendMessage();
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -171,6 +187,7 @@ app
 
 
 export {
+  app,
   mainWindow,
   ipc,
   websocket,

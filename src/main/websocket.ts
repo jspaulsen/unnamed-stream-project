@@ -1,4 +1,4 @@
-import * as WebSocket from 'ws';
+import { WebSocketServer } from 'ws'
 
 
 enum MessageType {
@@ -6,20 +6,41 @@ enum MessageType {
     Video,
     Image,
     Mixed,
+    Text,
 };
 
-interface Action {
-    source_type: MessageType,
-    source_url: string,
-    duration?: number,
-    position_x?: number,
-    position_y?: number,
-};
 
 interface Message {
     message_type: MessageType,
     steps: Action[],
 }
+
+interface Action {
+    source_type: MessageType;
+}
+
+interface PositionedAction extends Action {
+    position_x: number,
+    position_y: number,
+}
+
+interface DurationAction extends Action {
+    duration: number,
+}
+
+interface SourceAction extends Action {
+    source_url: string,
+}
+
+interface ImageAction extends SourceAction, PositionedAction, DurationAction {}
+interface AudioAction extends SourceAction {}
+interface TextAction extends PositionedAction, DurationAction {
+    font_size: number,
+    font_family?: string,
+    font_color?: string,
+    text: string,
+}
+
 
 interface WebsocketServerOpts {
     port: number;
@@ -52,7 +73,7 @@ class MessageQueue {
 class WebsocketServer {
     private port: number;
     private queue: MessageQueue;
-    private wss: WebSocket.Server | null;
+    private wss: WebSocketServer | null;
 
     constructor(opts: WebsocketServerOpts) {
         this.port = opts.port;
@@ -68,7 +89,7 @@ class WebsocketServer {
     }
 
     public run() {
-        this.wss = new WebSocket.Server({ port: this.port });
+        this.wss = new WebSocketServer({ port: this.port });
         this.wss.on('connection', this.onConnection.bind(this));
 
         this.handle_forever();
@@ -82,13 +103,12 @@ class WebsocketServer {
         }
 
         if (message) {
-            console.log('Sending message to clients');
             this.wss.clients.forEach((client) => {
                 client.send(JSON.stringify(message));
             });
         }
 
-        setTimeout(this.handle_forever.bind(this), 100);
+        setTimeout(this.handle_forever.bind(this), 100); // TODO: make this configurable
     }
 
     public close(): void {
@@ -103,6 +123,9 @@ class WebsocketServer {
 export {
     Action,
     Message,
+    AudioAction,
+    ImageAction,
+    TextAction,
     MessageType,
     MessageQueue,
     WebsocketServer,

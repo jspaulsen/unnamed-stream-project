@@ -18,7 +18,7 @@ interface OpenFileData {
     filters: Filters[];
 }
 
-ipcMain.handle('open-file', async (event: IpcMainInvokeEvent, data: OpenFileData) => {
+ipcMain.handle('open-file', async (_: IpcMainInvokeEvent, data: OpenFileData) => {
     if (!mainWindow) {
         return;
     }
@@ -36,14 +36,14 @@ ipcMain.handle('get-access-token', async (_: IpcMainInvokeEvent, __: any) => {
         .getSecret('accessToken');
 });
 
-ipcMain.handle('set-access-token', async (event: IpcMainInvokeEvent, data: any) => {
+ipcMain.handle('set-access-token', async (_: IpcMainInvokeEvent, data: any) => {
     console.log('set-access-token', data);
     Configuration
         .getInstance()
         .setSecret('accessToken', data.accessToken);
 });
 
-ipcMain.handle('authorize-twitch', async (event: IpcMainInvokeEvent, data: any) => {
+ipcMain.handle('authorize-twitch', async (_: IpcMainInvokeEvent, __: any) => {
     const configuration = Configuration.getInstance();
     const clientId = configuration.get('twitchClientId');
     const scopes = configuration.get('twitchScopes');

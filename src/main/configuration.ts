@@ -1,5 +1,6 @@
 import { app, safeStorage } from 'electron';
 import fs from 'fs';
+import path from 'path';
 
 const APPLICATION_NAME = 'shiddy';
 const APPLICATION_DATA_PATH = app.getPath('userData') + '/' + APPLICATION_NAME + '/data';
@@ -8,6 +9,19 @@ interface Storage {
     [key: string]: any;
 }
 
+/* Decide where dist directory is; if we're running in production, it should be relative;
+    otherwise, it should be relative to the root of the project
+*/
+
+let DIST_PATH = '';
+
+if (process.env.NODE_ENV === 'production') {
+    DIST_PATH = path.join(__dirname, 'dist');
+} else {
+    DIST_PATH = path.join(process.cwd(), 'release/app/dist');
+}
+
+
 class Configuration {
     private static instance: Configuration;
     private configuration: Storage = {
@@ -15,6 +29,7 @@ class Configuration {
         applicationVersion: '0.1.0',
         dataPath: APPLICATION_DATA_PATH,
         websocketPort: 6969,
+        httpPort: 3001,
         twitchClientId: 'x4ialb6ptemxp1pgyyytyckgme7qp7',
         twitchScopes: [ // These are all scopes required by comfy.js
             'channel:manage:redemptions',
@@ -36,7 +51,10 @@ class Configuration {
             fs.writeFileSync(configurationFilePath, JSON.stringify(this.configuration));
         }
 
-        this.configuration = this.getConfiguration();
+        this.configuration = {
+            ...this.configuration,
+            ...this.getConfiguration(),
+        };
     }
     
     public get(key: string): any | undefined {
@@ -100,3 +118,7 @@ class Configuration {
 }
 
 export default Configuration;
+export {
+    Configuration,
+    DIST_PATH,
+}

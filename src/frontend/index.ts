@@ -14,7 +14,8 @@ async function main() {
     }
 
     const queue = new Queue();
-    const websocket = new WSClient(wsUrl, queue);
+    const immediateQueue = new Queue();
+    const websocket = new WSClient(wsUrl, queue, immediateQueue);
 
     const canvas = document.getElementById('canvas') as HTMLDivElement;
     const audio = document.getElementById('audio') as HTMLAudioElement;
@@ -29,7 +30,12 @@ async function main() {
         return;
     }
 
-    const renderer = new Renderer(queue, canvas, audio);
+    const renderer = new Renderer(
+        queue,
+        immediateQueue,
+        canvas, 
+        audio,
+    );
 
     await websocket.connect();
     renderer.render();

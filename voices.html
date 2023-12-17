@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style type="text/css"></style>
+    <script src="https://cdn.jsdelivr.net/npm/comfy.js@latest/dist/comfy.min.js"></script>
+    <script src="comfy.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/comfy.js"></script>
+    <!--    tell the page what kind of page it is  -->
+  </head>
+  <audio id="ttsAudio">
+    <source src="" type="audio/mp3">
+  </audio>
+  <script>
+    
+    const textQueue = [];
+    let isPlaying = false;
+
+    async function betterTTS() {
+      if (!isPlaying) {
+        await playNextText();
+      }
+    }
+
+    async function playNextText() {
+      if (textQueue.length > 0) {
+        isPlaying = true;
+
+        const blobUrl = textQueue.shift();
+        ttsAudio.setAttribute("src", blobUrl);
+
+        ttsAudio.onended = () => {
+          isPlaying = false;
+          playNextText(); // Play the next text after the current audio ends
+        };
+
+        ttsAudio.play();
+      } else {
+        isPlaying = false;
+      }
+    }
+
+    async function skipCurrentText() {
+      ttsAudio.pause();
+      ttsAudio.src = "";
+      playNextText();
+    }
+
+    async function BrianTTS(msg) {
+      let speak = await fetch(
+        "https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=" +
+          encodeURIComponent(msg.trim())
+      );
+      if (speak.status !== 200) {
+        alert(await speak.text());
+        isPlaying = false; // Set isPlaying to false in case of an error
+        return;
+      }
+
+      let mp3 = await speak.blob();
+      let blobUrl = URL.createObjectURL(mp3);
+      textQueue.push(blobUrl);
+      betterTTS();
+    }
+
+    async function KendraTTS(msg) {
+      let speak = await fetch(
+        "https://api.streamelements.com/kappa/v2/speech?voice=Kendra&text=" +
+          encodeURIComponent(msg.trim())
+      );
+      if (speak.status !== 200) {
+        alert(await speak.text());
+        isPlaying = false; // Set isPlaying to false in case of an error
+        return;
+      }
+
+      let mp3 = await speak.blob();
+      let blobUrl = URL.createObjectURL(mp3);
+      textQueue.push(blobUrl);
+      betterTTS();
+    }
+    
+    async function GeraintTTS(msg) {
+      let speak = await fetch(
+        "https://api.streamelements.com/kappa/v2/speech?voice=Geraint&text=" +
+          encodeURIComponent(msg.trim())
+      );
+      if (speak.status !== 200) {
+        alert(await speak.text());
+        isPlaying = false; // Set isPlaying to false in case of an error
+        return;
+      }
+
+      let mp3 = await speak.blob();
+      let blobUrl = URL.createObjectURL(mp3);
+      textQueue.push(blobUrl);
+      betterTTS();
+    }
+    
+    function loadBlacklist(callback) {
+      fetch("blacklist.txt")
+        .then((response) => response.text())
+        .then((text) => {
+          const blacklist = text
+            .split("\n")
+            .map((word) => word.trim())
+            .filter((word) => word !== "");
+          callback(blacklist);
+        })
+        .catch((err) => {
+          console.error("Error loading the blacklist:", err);
+          callback([]);
+        });
+    }
+
+    function redactWords(initialMsg) {
+      return new Promise((resolve) => {
+        loadBlacklist((blacklist) => {
+          let redactedText = initialMsg;
+
+          blacklist.forEach((word) => {
+            const regex = new RegExp("\\b" + word + "\\b", "gi");
+            redactedText = redactedText.replace(regex, "undefined");
+          });
+
+          resolve(redactedText);
+        });
+      });
+    }
+
+    ttsAudio.addEventListener("ended", playNextText);
+
+    ComfyJS.onChat = async (user, message, flags, self, extra) => {
+      if (
+        flags.customReward &&
+        extra.customRewardId === "8721efbe-9507-4817-9c95-ec49ded38c4d"
+      ) {
+        // TTS Brian
+        const msg = await redactWords(message);
+        BrianTTS(msg);
+        betterTTS();
+      } else if (
+        flags.customReward &&
+        extra.customRewardId === "02341ceb-56bb-4a5c-a71a-f68946771ecc"
+      ) {
+        // TTS Kendra
+        const msg = await redactWords(message);
+        KendraTTS(msg);
+        betterTTS();
+      }
+      else if (
+        flags.customReward &&
+        extra.customRewardId === "51147745-40a6-46dc-b127-9d00402fab2c"
+      ) {
+        // TTS Geraint
+        const msg = await redactWords(message);
+        GeraintTTS(msg);
+        betterTTS();
+      }
+      else if (
+        flags.customReward &&
+        extra.customRewardId === "433c3d29-3bb5-462b-a5aa-805a15ef8af0"
+      ) {
+        skipCurrentText();
+      }
+    };
+
+    ComfyJS.onReward = (user, reward, cost, message, extra) => {
+      console.log("ID = " + extra.reward.id);
+
+      if (extra.reward.id == "433c3d29-3bb5-462b-a5aa-805a15ef8af0") {
+        // Skip TTS
+        skipCurrentText();
+      }
+    };
+  </script>
+</html>

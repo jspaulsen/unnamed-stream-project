@@ -1,4 +1,4 @@
-import { Message, MessageType } from "./message";
+import { Message, MessageType, Action, ImageAction } from "./message";
 import { Renderer, RenderableSelector, RenderContext } from "./render";
 import { Queue } from "./queue";
 
@@ -9,7 +9,7 @@ describe('render', () => {
             steps: [{
                 source_type: MessageType.Image,
                 source_url: 'https://i.imgur.com/9g7Bk2D.jpg',
-            }],
+            } as ImageAction],
         };
         
         const mock_div = {
@@ -41,7 +41,7 @@ describe('render', () => {
             steps: [{
                 source_type: MessageType.Audio,
                 source_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-            }],
+            } as Action],
         };
 
         const mock_div = {
@@ -81,10 +81,10 @@ describe('render', () => {
             steps: [{
                 source_type: MessageType.Audio,
                 source_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-            }, {
+            } as Action, {
                 source_type: MessageType.Image,
                 source_url: 'https://i.imgur.com/9g7Bk2D.jpg',
-            }],
+            } as ImageAction],
         };
 
         const mock_div = {
@@ -127,10 +127,10 @@ describe('render', () => {
             steps: [{
                 source_type: MessageType.Audio,
                 source_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-            }, {
+            } as Action, {
                 source_type: MessageType.Image,
                 source_url: 'https://i.imgur.com/9g7Bk2D.jpg',
-            }],
+            } as ImageAction],
         };
 
         const mock_div = {
@@ -147,6 +147,7 @@ describe('render', () => {
         const queue = new Queue();
         const renderer = new Renderer(
             queue,
+            new Queue(),
             mock_div as unknown as HTMLDivElement,
             mock_audio as unknown as HTMLAudioElement,
         );
