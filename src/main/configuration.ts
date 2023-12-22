@@ -81,7 +81,12 @@ class Configuration {
     }
 
     public setSecret(key: string, value: any): void {
-        this.configuration[key] = safeStorage.encryptString(value);
+        if (value === null || value === undefined) {
+            delete this.configuration[key];
+        } else {
+            this.configuration[key] = safeStorage.encryptString(value);
+        }
+        
         this._saveOnSet();
     }
 

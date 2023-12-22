@@ -1,6 +1,6 @@
 import { getAuthState } from "./slices/Auth";
 import { useDispatch } from "react-redux";
-import { setAuthState } from "./slices/Auth";
+import { setAuthState, unsetAuthState } from "./slices/Auth";
 import Login from "./Login";
 import { ipc } from "./ipc";
 import { TwitchClient } from "./clients/Twitch";
@@ -29,7 +29,13 @@ export default function AuthLogin (props: AuthProps) {
                 return;
             }
 
-            console.log(validate);
+            // check the token expiry; if it's less than 7 days
+            // reauthorize
+            const expiry = (validate.expires_in / 60 / 60 / 24);
+
+            if (expiry < 7) {
+                dispatch(unsetAuthState());
+            }
 
             const newState = {
                 ...authState,
@@ -37,7 +43,6 @@ export default function AuthLogin (props: AuthProps) {
                 username: validate.login,
             };
             
-            console.log(`Setting auth state: ${JSON.stringify(newState)}`);
             dispatch(setAuthState(newState));
         })();
     }

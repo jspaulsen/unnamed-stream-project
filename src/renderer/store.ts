@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import AuthState from "./slices/Auth";
+import RewardState from "./slices/Rewards";
 
 
 // Use `configureStore` function to create the store:
 export const store = configureStore({
     reducer: {
         authState: AuthState.reducer,
+        rewardState: RewardState.reducer,
     },
 });
 

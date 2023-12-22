@@ -4,6 +4,7 @@ import App from './App';
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
 
+window.resizeTo(920, 670);
 root.render(<App />);
 
 // console.log(

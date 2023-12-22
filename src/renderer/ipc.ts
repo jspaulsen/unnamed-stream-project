@@ -46,6 +46,10 @@ class IpcInterface {
             data: {},
         });
     }
+
+    quit() {
+        ipcRenderer.sendMessage('app-quit');
+    }
 }
 
 const ipc = new IpcInterface();

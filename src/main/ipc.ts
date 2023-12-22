@@ -1,5 +1,5 @@
 import { BrowserWindow, IpcMain, IpcMainEvent, IpcMainInvokeEvent, dialog, ipcMain } from 'electron';
-import { mainWindow } from './main';
+import { app, mainWindow } from './main';
 import Configuration from './configuration';
 import axios from 'axios';
 import { access } from 'fs';
@@ -17,6 +17,10 @@ interface OpenFileData {
     defaultPath?: string;
     filters: Filters[];
 }
+
+ipcMain.on('app-quit', () => {
+    app.quit();
+});
 
 ipcMain.handle('open-file', async (_: IpcMainInvokeEvent, data: OpenFileData) => {
     if (!mainWindow) {

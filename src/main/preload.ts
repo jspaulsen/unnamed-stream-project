@@ -2,7 +2,7 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'open-file' | 'get-access-token' | 'set-access-token' | 'authorize-twitch' | 'get-access-token-reply';
+export type Channels = 'open-file' | 'get-access-token' | 'set-access-token' | 'authorize-twitch' | 'app-quit';
 
 const electronHandler = {
   ipcRenderer: {
