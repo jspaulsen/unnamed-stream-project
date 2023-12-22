@@ -7,6 +7,7 @@ interface AuthState {
     accessToken?: string;
     username?: string;
     user_id?: string;
+    client_id?: string;
 }
 
 
@@ -28,6 +29,7 @@ const AuthStateSlice = createSlice({
             state.accessToken = action.payload.accessToken;
             state.username = action.payload.username;
             state.user_id = action.payload.user_id;
+            state.client_id = action.payload.client_id;
             
             storeState(state);
         },
@@ -35,12 +37,10 @@ const AuthStateSlice = createSlice({
             state.accessToken = undefined;
             state.username = undefined;
             state.user_id = undefined;
+            state.client_id = undefined;
             
             unsetState();
         },
-        // unsetJwt: (state) => {
-        //     state.access_token = undefined;
-        // }
     },
 });
 

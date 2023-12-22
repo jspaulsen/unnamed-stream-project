@@ -23,25 +23,26 @@ interface Reward {
 
 interface RewardState {
     rewards: Reward[];
+    fetched: boolean;
 }
 
 
 const RewardStateSlice = createSlice({
     name: "AuthState",
-    // initialState,
-    initialState: {} as RewardState,
+    initialState: {fetched: false, rewards:[]} as RewardState,
     reducers: {
         setRewards: (state, action) => {
-            state.rewards = action.payload;
+            state.fetched = action.payload.fetched;
+            state.rewards = action.payload.rewards;
         },
     },
 });
 
 
 const getRewards = () => {
-    return useSelector((state: any) => state.rewards);
+    return useSelector((state: any) => state.rewardState);
 }
 
 export default RewardStateSlice;
-export { getRewards };
+export { getRewards, RewardState };
 export const { setRewards } = RewardStateSlice.actions;

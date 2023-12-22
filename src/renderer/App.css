@@ -16,6 +16,12 @@ body {
   display: none;
 }
 
+/* Makes the window draggable */
+#draggable {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
 /* body {
   position: relative;
   color: white;

@@ -41,7 +41,6 @@ ipcMain.handle('get-access-token', async (_: IpcMainInvokeEvent, __: any) => {
 });
 
 ipcMain.handle('set-access-token', async (_: IpcMainInvokeEvent, data: any) => {
-    console.log('set-access-token', data);
     Configuration
         .getInstance()
         .setSecret('accessToken', data.accessToken);

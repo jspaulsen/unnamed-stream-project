@@ -37,9 +37,11 @@ interface TwitchCustomRewardResponse {
 
 class TwitchClient {
     private token: string;
+    private client_id?: string;
 
-    constructor(token: string) {
+    constructor(token: string, client_id?: string) {
         this.token = token;
+        this.client_id = client_id;
     }
 
     async validateToken(): Promise<TwitchTokenValidationResponse | null> {
@@ -58,9 +60,22 @@ class TwitchClient {
         return result.data;
     }
 
-    async getCustomRewards(user_id: string): Promise<TwitchCustomRewardResponse> {
-        //GET https://api.twitch.tv/helix/channel_points/custom_rewards
-        throw new Error('Not implemented');
+    async getCustomRewards( user_id: string): Promise<TwitchCustomRewardResponse | null> {
+        const result = await axios.get(`${TWITCH_URL}/channel_points/custom_rewards`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+                'Client-Id': this.client_id,
+            },
+            params: {
+                broadcaster_id: user_id,
+            },
+        });
+
+        if (result.status !== 200) {
+            return null;
+        }
+
+        return result.data.data;
     }
 };
 

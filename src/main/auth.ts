@@ -35,6 +35,12 @@ function authorizeTwitch(opts: AuthorizeTwitchOpts): Promise<string | null> {
         autoHideMenuBar: true,
     });
 
+    // Twitch doesn't like the default user agent, so we'll lie and say we're Chrome
+    authWindow.webContents.on('did-create-window', (window) => {
+        window.webContents.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    });
+
+
     authWindow.loadURL(url.toString());
 
     authWindow.webContents.on('will-navigate', (event, url) => {

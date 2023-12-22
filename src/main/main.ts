@@ -31,10 +31,6 @@ class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 
 const configuration: Configuration = Configuration.getInstance();
-
-// log the app directory
-console.log('app directory', app.getPath('userData') + '/unnamed-application' + '/data');
-
 const queue = new MessageQueue();
 const websocket = new WebsocketServer({
   port: configuration.get('websocketPort'),
@@ -120,7 +116,7 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    frame: false,
+    // frame: false,
     width: 1024,
     height: 728,
     icon: getAssetPath('icon.png'),

@@ -29,6 +29,7 @@ export default function Login() {
             accessToken,
             username: validate.login,
             user_id: validate.user_id,
+            client_id: validate.client_id,
         };
 
         dispatch(setAuthState(newState));

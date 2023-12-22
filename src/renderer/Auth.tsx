@@ -40,6 +40,8 @@ export default function AuthLogin (props: AuthProps) {
             const newState = {
                 ...authState,
                 accessToken,
+                client_id: validate.client_id,
+                user_id: validate.user_id,
                 username: validate.login,
             };
             

@@ -6,24 +6,22 @@ import './App.css';
 
 import { Provider } from 'react-redux';
 import { store } from './store';
+import AddEvent from './AddEvent';
+import TitleBar from './TitleBar';
 
 export default function App() {
   return (
     <Provider store={store}>
       <AuthLogin>
+      <TitleBar />
         <Router>
           <Routes>
             <Route path="/" element={<Main />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/add-event" element={<AddEvent />} />
           </Routes>
         </Router>
       </AuthLogin>
     </Provider>
   );
 }
-
-// TODO: Need a callback route for Twitch OAuth
-
-{/* <Route path="/main" element={<PrivateRoute> <Main/> </PrivateRoute>}/>
-<Route path="/about" element={<PrivateRoute> <About/> </PrivateRoute>}/>
-<Route path="/login" element={<Login/>}/> */}
