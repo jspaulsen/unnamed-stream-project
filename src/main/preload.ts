@@ -2,7 +2,7 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'open-file' | 'get-access-token' | 'set-access-token' | 'authorize-twitch' | 'app-quit';
+export type Channels = 'open-file' | 'get-twitch-access-token' | 'set-twitch-access-token' | 'authorize-twitch' | 'app-quit' | 'authorize-spotify' | 'get-spotify-refresh-token' | 'set-spotify-refresh-token' | 'get-spotify-client-id';
 
 const electronHandler = {
   ipcRenderer: {

@@ -4,52 +4,89 @@ import { ipc } from "../ipc";
 
 
 interface AuthState {
-    accessToken?: string;
+    twitchAccessToken?: string;
+    spotifyAccessToken?: string;
+    spotifyRefreshToken?: string;
     username?: string;
-    user_id?: string;
-    client_id?: string;
-}
-
-
-function storeState(state: AuthState) {
-    ipc.setAccessToken(state.accessToken);
-}
-
-function unsetState() {
-    ipc.setAccessToken(undefined);
+    userId?: string;
+    clientId?: string;
 }
 
 
 const AuthStateSlice = createSlice({
     name: "AuthState",
-    // initialState,
     initialState: {} as AuthState,
     reducers: {
-        setAuthState: (state, action) => {
-            state.accessToken = action.payload.accessToken;
-            state.username = action.payload.username;
-            state.user_id = action.payload.user_id;
-            state.client_id = action.payload.client_id;
-            
-            storeState(state);
+        setTwitchAccessToken: (state, action) => {
+            state.twitchAccessToken = action.payload;
+            ipc.setTwitchAccessToken(action.payload);
+        },
+        setSpotifyAccessToken: (state, action) => {
+            state.spotifyAccessToken = action.payload;
+        },
+        setSpotifyRefreshToken: (state, action) => {
+            state.spotifyRefreshToken = action.payload;
+            ipc.setSpotifyRefreshToken(action.payload);
+        },
+        setUsername: (state, action) => {
+            state.username = action.payload;
+        },
+        setUserId: (state, action) => {
+            state.userId = action.payload;
+        },
+        setClientId: (state, action) => {
+            state.clientId = action.payload;
+        },
+        unsetTwitchAccessToken: (state) => {
+            state.twitchAccessToken = undefined;
+            ipc.setTwitchAccessToken(undefined);
+        },
+        unsetSpotifyRefreshToken: (state) => {
+            state.spotifyRefreshToken = undefined;
+            state.spotifyAccessToken = undefined;
+
+            ipc.setSpotifyRefreshToken(undefined);
         },
         unsetAuthState: (state) => {
-            state.accessToken = undefined;
+            state.twitchAccessToken = undefined;
+            state.spotifyRefreshToken = undefined;
+            state.spotifyAccessToken = undefined;
             state.username = undefined;
-            state.user_id = undefined;
-            state.client_id = undefined;
-            
-            unsetState();
-        },
+            state.userId = undefined;
+
+            ipc.setTwitchAccessToken(undefined);
+            ipc.setSpotifyRefreshToken(undefined);
+        }
     },
 });
 
 
-const getAuthState = () => {
-    return useSelector((state: any) => state.authState);
-}
+const getTwitchAccessToken = () => {return useSelector((state: any) => state.authState.twitchAccessToken)}
+const getSpotifyAccessToken = () => {return useSelector((state: any) => state.authState.spotifyAccessToken)}
+const getSpotifyRefreshToken = () => {return useSelector((state: any) => state.authState.spotifyRefreshToken)}
+const getUsername = () => {return useSelector((state: any) => state.authState.username)}
+const getUserId = () => {return useSelector((state: any) => state.authState.userId)}
+const getClientId = () => {return useSelector((state: any) => state.authState.clientId)}
 
 
 export default AuthStateSlice;
-export { getAuthState };
-export const { setAuthState, unsetAuthState } = AuthStateSlice.actions;
+export { 
+    getTwitchAccessToken,
+    getSpotifyAccessToken,
+    getSpotifyRefreshToken,
+    getUsername,
+    getUserId,
+    getClientId,
+};
+
+export const {
+    unsetAuthState,
+    unsetTwitchAccessToken,
+    unsetSpotifyRefreshToken,
+    setTwitchAccessToken,
+    setSpotifyAccessToken,
+    setSpotifyRefreshToken,
+    setUsername,
+    setUserId,
+    setClientId,
+} = AuthStateSlice.actions;

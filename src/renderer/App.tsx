@@ -1,6 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthLogin from './Auth';
-import Login from './Login';
 import Main from './Main';
 import './App.css';
 
@@ -17,7 +16,6 @@ export default function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Main />} />
-            <Route path="/login" element={<Login />} />
             <Route path="/add-event" element={<AddEvent />} />
           </Routes>
         </Router>

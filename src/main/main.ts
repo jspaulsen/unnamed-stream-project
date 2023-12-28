@@ -10,71 +10,26 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
+// import { autoUpdater } from 'electron-updater';
+// import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import Configuration from './configuration';
 import { MessageQueue, WebsocketServer, Message, MessageType, Action } from './websocket';
 import * as ipc from './ipc';
-import { httpServer } from './http';
 
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+// class AppUpdater {
+//   constructor() {
+//     log.transports.file.level = 'info';
+//     autoUpdater.logger = log;
+//     autoUpdater.checkForUpdatesAndNotify();
+//   }
+// }
+
 
 let mainWindow: BrowserWindow | null = null;
 
-const configuration: Configuration = Configuration.getInstance();
-const queue = new MessageQueue();
-const websocket = new WebsocketServer({
-  port: configuration.get('websocketPort'),
-  queue: queue,
-});
-
-
-websocket.run();
-httpServer.listen(
-  configuration.get('httpPort'),
-  () => { console.log(`listening on port ${configuration.get('httpPort')}`) },
-);
-
-function sendMessage() {
-  setInterval(async () => {
-    const message: Message = {
-      message_type: MessageType.Mixed,
-      steps: [
-        {
-          source_type: MessageType.Image,
-          source_url: 'https://www.w3schools.com/html/pic_trulli.jpg',
-          position_x: 150,
-          position_y: 150,
-          duration: 2,
-        } as Action,
-        {
-          source_type: MessageType.Text,
-          text: 'Hello World',
-          position_x: 150,
-          position_y: 150,
-          font_size: 72,
-          font_family: 'Comic Sans MS',
-          font_color: 'red',
-          duration: 2,
-        } as Action,
-      ],
-    };
-
-    await queue.enqueue(message);
-  }, 5000);
-}
-
-
-sendMessage();
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -155,7 +110,7 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
 
 /**
@@ -187,5 +142,4 @@ export {
   app,
   mainWindow,
   ipc,
-  websocket,
 }

@@ -2,8 +2,10 @@ import { app, safeStorage } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
+
 const APPLICATION_NAME = 'shiddy';
 const APPLICATION_DATA_PATH = app.getPath('userData') + '/' + APPLICATION_NAME + '/data';
+
 
 interface Storage {
     [key: string]: any;
@@ -31,6 +33,9 @@ class Configuration {
         websocketPort: 6969,
         httpPort: 3001,
         twitchClientId: 'x4ialb6ptemxp1pgyyytyckgme7qp7',
+        spotifyClientId: 'c47877614f4e4632b293a40fe7a260e2',
+        twitchCallbackUrl: 'http://localhost/callback',
+        spotifyCallbackUrl: 'http://localhost:3000/callback',
         twitchScopes: [ // These are all scopes required by comfy.js
             'channel:manage:redemptions',
             'channel:read:redemptions',
@@ -38,8 +43,12 @@ class Configuration {
             'chat:edit',
             'chat:read',
         ],
+        spotifyScopes: [ // Scopes required to control playback
+            'user-modify-playback-state',
+            'user-read-playback-state',
+        ],
     };
-    
+
     private constructor () {
         const configurationFilePath = this.getConfigurationFilePath();
 

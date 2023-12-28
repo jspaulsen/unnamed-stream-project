@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { TwitchClient } from "./clients/Twitch";
-import { getAuthState } from "./slices/Auth";
+import { getClientId, getTwitchAccessToken, getUserId } from "./slices/Auth";
 import { getRewards, RewardState, setRewards } from "./slices/Rewards";
 import { FormControl, Grid, InputLabel, MenuItem, Select, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -49,16 +49,20 @@ function LabeledDropdown(props: LabeledDropdownProps) {
 
 export default function AddEvent() {
   const rewardState: RewardState = getRewards();
-  const authState = getAuthState();
   const dispatch = useDispatch();
+
+  const twitchAccessToken = getTwitchAccessToken();
+  const twitchClientId = getClientId();
+  const userId = getUserId();
+
   const [onEvent, setOnEvent] = React.useState<string>("Reward Redeemed");
   const [reward, setReward] = React.useState<string>("");
   const renderReward = onEvent === "Reward Redeemed";
 
   if (!rewardState.fetched) {
     (async () => {
-      const client = new TwitchClient(authState.accessToken, authState.client_id);
-      const rewards = await client.getCustomRewards(authState.user_id);
+      const client = new TwitchClient(twitchAccessToken, twitchClientId);
+      const rewards = await client.getCustomRewards(userId);
 
       const newState = {
         fetched: true,
