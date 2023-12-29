@@ -49,29 +49,16 @@ function LabeledDropdown(props: LabeledDropdownProps) {
 
 export default function AddEvent() {
   const rewardState: RewardState = getRewards();
-  const dispatch = useDispatch();
+  const events = [
+    'Reward',
+    'Chat Command',
+  ];
 
-  const twitchAccessToken = getTwitchAccessToken();
-  const twitchClientId = getClientId();
-  const userId = getUserId();
+  // const dispatch = useDispatch();
 
-  const [onEvent, setOnEvent] = React.useState<string>("Reward Redeemed");
+  const [onEvent, setOnEvent] = React.useState<string>(events[0]);
   const [reward, setReward] = React.useState<string>("");
-  const renderReward = onEvent === "Reward Redeemed";
-
-  if (!rewardState.fetched) {
-    (async () => {
-      const client = new TwitchClient(twitchAccessToken, twitchClientId);
-      const rewards = await client.getCustomRewards(userId);
-
-      const newState = {
-        fetched: true,
-        rewards: rewards,
-      };
-
-      dispatch(setRewards(newState));
-    })();
-  }
+  const renderReward = onEvent === events[0];
 
   // render a list of the rewards
   return (
@@ -96,7 +83,7 @@ export default function AddEvent() {
         </Grid>
           <LabeledDropdown
             label="On Event"
-            options={["Reward Redeemed", "Chat Message"]}
+            options={events}
             value={onEvent}
             setValue={setOnEvent}
           />

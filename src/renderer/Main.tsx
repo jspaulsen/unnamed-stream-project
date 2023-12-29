@@ -3,6 +3,11 @@ import Paper from "@mui/material/Paper";
 import { Typography } from "@mui/material";
 import TitleBar from "./TitleBar";
 import { useNavigate } from "react-router-dom";
+import { RewardState, getRewards, setRewards } from "./slices/Rewards";
+import { useDispatch } from "react-redux";
+import { getClientId, getTwitchAccessToken, getUserId } from "./slices/Auth";
+import React from "react";
+import { TwitchClient } from "./clients/Twitch";
 
 
 interface EventItemProps {
@@ -57,6 +62,28 @@ function EventItem(props: EventItemProps) {
 
 export default function Main() {
   const navigate = useNavigate();
+
+  const rewardState: RewardState = getRewards();
+  const dispatch = useDispatch();
+
+  const twitchAccessToken = getTwitchAccessToken();
+  const twitchClientId = getClientId();
+  const userId = getUserId();
+
+  if (!rewardState.fetched) {
+    (async () => {
+      const client = new TwitchClient(twitchAccessToken, twitchClientId);
+      const rewards = await client.getCustomRewards(userId);
+
+      const newState = {
+        fetched: true,
+        rewards: rewards,
+      };
+
+      dispatch(setRewards(newState));
+    })();
+  }
+
 
   return (
     <>
