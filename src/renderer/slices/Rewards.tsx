@@ -44,5 +44,5 @@ const getRewards = () => {
 }
 
 export default RewardStateSlice;
-export { getRewards, RewardState };
+export { getRewards, RewardState, Reward };
 export const { setRewards } = RewardStateSlice.actions;

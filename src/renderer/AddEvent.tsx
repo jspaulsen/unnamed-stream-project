@@ -1,66 +1,38 @@
-import { useDispatch } from "react-redux";
-import { TwitchClient } from "./clients/Twitch";
-import { getClientId, getTwitchAccessToken, getUserId } from "./slices/Auth";
-import { getRewards, RewardState, setRewards } from "./slices/Rewards";
-import { FormControl, Grid, InputLabel, MenuItem, Select, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { Label } from "@mui/icons-material";
+import { getRewards, RewardState } from "./slices/Rewards";
+import { Button, Grid, Typography } from "@mui/material";
 import React from "react";
+import LabeledDropdown from "./events/LabeledDropdown";
+import RewardRedemption from "./events/RewardRedemption";
+import { Chat } from "@mui/icons-material";
+import ChatCommand from "./events/ChatCommand";
 
-
-interface LabeledDropdownProps {
-  label: string;
-  options: string[];
-  value: string;
-  setValue: (val: string) => void;
-}
-
-function LabeledDropdown(props: LabeledDropdownProps) {
-  const id = `labeled-dropdown-${props.label}`;
-
-  return (
-      <Grid 
-        item 
-        xs={3}
-        // align left
-        sx={{ textAlign: 'left' }}
-      >
-        <FormControl variant="standard" sx={{ minWidth: 120 }}>
-          <InputLabel id={id}>{props.label}</InputLabel>
-          <Select
-            labelId={id}
-            id={id}
-            value={props.value || props.options[0]}
-            onChange={(e) => {
-              props.setValue(e.target.value as string);
-            }}
-            label={props.label} 
-          >
-            {props.options.map((option) => {
-              return (
-                <MenuItem value={option} key={option}>{option}</MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-      </Grid>
-  );
-}
 
 export default function AddEvent() {
-  const rewardState: RewardState = getRewards();
-  const events = [
-    'Reward',
-    'Chat Command',
-  ];
-
-  // const dispatch = useDispatch();
+  const events = ['Reward', 'Chat Command'];
+  const spotifyActions = ['Enqueue', 'Resume', 'Pause', 'Skip Song', 'Display Next Song'];
 
   const [onEvent, setOnEvent] = React.useState<string>(events[0]);
   const [reward, setReward] = React.useState<string>("");
+  const [command, setCommand] = React.useState<string>("");
+  const [spotifyAction, setSpotifyAction] = React.useState<string>(spotifyActions[0]);
+  const [error, setError] = React.useState<boolean>(false);
+
   const renderReward = onEvent === events[0];
 
-  // render a list of the rewards
+  const event = renderReward ? (
+    <RewardRedemption
+      reward={reward}
+      setReward={setReward}
+    />
+  ) : (
+    <ChatCommand
+      command={command}
+      setCommand={setCommand}
+      error={error}
+      setError={setError}
+    />
+  );
+  
   return (
     <>
       <Grid
@@ -73,33 +45,45 @@ export default function AddEvent() {
       >
         <Grid item xs={12} sx={{ textAlign: 'center' }}>
           <Typography
-            // text color is white
             color="white"
-            // h1 variant
             variant="h3"
           >
             Add New Event
           </Typography>
         </Grid>
-          <LabeledDropdown
-            label="On Event"
-            options={events}
-            value={onEvent}
-            setValue={setOnEvent}
-          />
-          {
-            renderReward ?
-            <LabeledDropdown
-              label="Reward"
-              options={rewardState.rewards.map((reward) => {
-                return reward.title;
-              })}
-              value={reward}
-              setValue={setReward}
-            /> :
-            <></>
-          }
+        <LabeledDropdown
+          label="On Event"
+          options={events}
+          value={onEvent}
+          setValue={setOnEvent}
+        />
+        {event}
+        <LabeledDropdown
+          label="Spotify Action"
+          options={spotifyActions}
+          value={spotifyAction}
+          setValue={setSpotifyAction}
+        />
+        <Grid
+          item
+          xs={12}
+          sx={{ justifyContent: 'center', display: 'flex' }}
+        >
+          <Button
+            variant="contained"
+            color='secondary'
+            sx={{
+              width: '250px',
+              fontSize: '1rem',
+              display: 'flex',
+              marginTop: 10,
+            }}
+            onClick={() => { }}
+          >
+            Save
+          </Button>
         </Grid>
+      </Grid>
     </>
   );
 }
